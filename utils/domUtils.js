@@ -1,4 +1,8 @@
-export const TEMPLATE_ID = 'lesson-card-template';
+export const TEMPLATE_IDS = {
+    lesson: 'lesson-card-template',
+    task: 'task-card-template',
+    quiz: 'quiz-question-template'
+};
 
 export const ACTION_SNIPPETS = {
     appendChild: (tag, text) => `const parent = document.querySelector('#previewList');\nconst node = document.createElement('${tag}');\nnode.textContent = '${text}';\nparent.appendChild(node);`,
@@ -8,7 +12,8 @@ export const ACTION_SNIPPETS = {
 };
 
 export async function ensureTemplateLoaded(path) {
-    if (document.getElementById(TEMPLATE_ID)) {
+    const missingTemplates = Object.values(TEMPLATE_IDS).filter((id) => !document.getElementById(id));
+    if (missingTemplates.length === 0) {
         return;
     }
 
@@ -20,29 +25,99 @@ export async function ensureTemplateLoaded(path) {
     const html = await response.text();
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html.trim();
-    const template = wrapper.querySelector('template');
+    const templates = wrapper.querySelectorAll('template');
 
-    if (!template) {
-        throw new Error('Plik szablonu nie zawiera elementu <template>.');
+    if (!templates.length) {
+        throw new Error('Plik szablonu nie zawiera elementów <template>.');
     }
 
-    document.body.appendChild(template);
+    templates.forEach((template) => {
+        if (!template.id) {
+            return;
+        }
+        if (!document.getElementById(template.id)) {
+            document.body.appendChild(template);
+        }
+    });
 }
 
 export function createLessonCard({ title, description, badge, code }) {
-    const template = document.getElementById(TEMPLATE_ID);
-    if (!template) {
-        throw new Error('Szablon kart lekcji nie został jeszcze załadowany.');
-    }
-
-    const fragment = template.content.cloneNode(true);
+    const fragment = cloneTemplate(TEMPLATE_IDS.lesson);
     fragment.querySelector('[data-lesson-title]').textContent = title;
     fragment.querySelector('[data-lesson-description]').textContent = description;
     fragment.querySelector('[data-lesson-badge]').textContent = badge ?? '';
 
     const codeElement = fragment.querySelector('[data-lesson-code]');
-    codeElement.textContent = code.trim();
-    highlightBlock(codeElement);
+    if (code) {
+        codeElement.textContent = code.trim();
+        highlightBlock(codeElement);
+    } else {
+        codeElement.parentElement?.remove();
+    }
+
+    return fragment;
+}
+
+export function createTaskCard({ id, title, description, level, steps }) {
+    const fragment = cloneTemplate(TEMPLATE_IDS.task);
+    const root = fragment.querySelector('[data-task-root]');
+    if (root) {
+        root.dataset.taskId = id;
+    }
+
+    fragment.querySelector('[data-task-title]').textContent = title;
+    fragment.querySelector('[data-task-description]').textContent = description;
+    fragment.querySelector('[data-task-level]').textContent = level ?? 'DOM';
+
+    const stepList = fragment.querySelector('[data-task-steps]');
+    steps.forEach((step) => {
+        const item = document.createElement('li');
+        item.textContent = step;
+        stepList.appendChild(item);
+    });
+
+    return fragment;
+}
+
+export function createQuizCard({ id, question, category, hint, code, options }) {
+    const fragment = cloneTemplate(TEMPLATE_IDS.quiz);
+    const root = fragment.querySelector('[data-quiz-root]');
+    if (root) {
+        root.dataset.quizId = id;
+    }
+
+    fragment.querySelector('[data-quiz-question]').textContent = question;
+    const categoryElement = fragment.querySelector('[data-quiz-category]');
+    categoryElement.textContent = category ?? 'Quiz';
+
+    const hintElement = fragment.querySelector('[data-quiz-hint]');
+    if (hint) {
+        hintElement.textContent = hint;
+    } else {
+        hintElement.remove();
+    }
+
+    const codeElement = fragment.querySelector('[data-quiz-code]');
+    if (code) {
+        codeElement.textContent = code.trim();
+        highlightBlock(codeElement);
+    } else {
+        codeElement.parentElement?.remove();
+    }
+
+    const optionsList = fragment.querySelector('[data-quiz-options]');
+    const groupName = `quiz-${id}`;
+    options.forEach(({ id: optionId, label }) => {
+        const optionItem = document.createElement('li');
+        const inputId = `${groupName}-${optionId}`;
+        optionItem.innerHTML = `
+            <label class="quiz-card__option" for="${inputId}">
+                <input type="radio" name="${groupName}" id="${inputId}" value="${optionId}">
+                <span>${label}</span>
+            </label>
+        `;
+        optionsList.appendChild(optionItem);
+    });
 
     return fragment;
 }
@@ -82,6 +157,14 @@ function readCookie(name) {
         .split('; ')
         .find((part) => part.startsWith(`${name}=`))
         ?.split('=')[1];
+}
+
+function cloneTemplate(id) {
+    const template = document.getElementById(id);
+    if (!template) {
+        throw new Error(`Szablon o identyfikatorze "${id}" nie został załadowany.`);
+    }
+    return template.content.cloneNode(true);
 }
 
 export function createElement(tag, attributes = {}, ...children) {

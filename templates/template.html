@@ -8,3 +8,38 @@
         <pre><code class="language-javascript" data-lesson-code></code></pre>
     </article>
 </template>
+
+<template id="task-card-template">
+    <article class="task-card" data-task-root>
+        <header class="task-card__header">
+            <div>
+                <span class="task-card__badge" data-task-level></span>
+                <h3 data-task-title></h3>
+            </div>
+            <span class="task-card__status" data-task-status>oczekuje</span>
+        </header>
+        <p data-task-description></p>
+        <ul class="task-card__steps" data-task-steps></ul>
+        <div class="task-card__actions">
+            <button class="cta" data-task-check>Sprawdź</button>
+            <button class="ghost" data-task-reset>Resetuj scenę</button>
+        </div>
+        <p class="task-card__feedback" data-task-feedback></p>
+    </article>
+</template>
+
+<template id="quiz-question-template">
+    <article class="quiz-card" data-quiz-root>
+        <header class="quiz-card__header">
+            <h3 data-quiz-question></h3>
+            <span class="quiz-card__category" data-quiz-category></span>
+        </header>
+        <p class="quiz-card__hint" data-quiz-hint></p>
+        <pre class="quiz-card__code"><code class="language-javascript" data-quiz-code></code></pre>
+        <ul class="quiz-card__options" data-quiz-options></ul>
+        <div class="quiz-card__actions">
+            <button class="cta" data-quiz-check>Sprawdź odpowiedź</button>
+        </div>
+        <p class="quiz-card__feedback" data-quiz-feedback></p>
+    </article>
+</template>
