@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Playground: appendChild i spółka</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-light.min.css">
+    <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+    <div class="orb orb-left"></div>
+    <div class="orb orb-right"></div>
+
+    <header class="hero">
+        <h1>DOM Playground</h1>
+        <p>Ćwicz <code>appendChild</code>, <code>insertBefore</code>, <code>replaceChild</code> i <code>removeChild</code> w jednym miejscu. Zobacz efekty na żywo i analizuj wygenerowany kod.</p>
+        <button id="startLessonBtn" class="cta">Zacznij eksperymentować</button>
+    </header>
+
+    <main id="appRoot">
+        <section id="lessonContainer" class="grid-container"></section>
+
+        <section id="playground" class="playground">
+            <div class="playground__controls">
+                <label>
+                    Wybierz operację DOM
+                    <select id="actionSelector">
+                        <option value="appendChild">appendChild</option>
+                        <option value="insertBefore">insertBefore</option>
+                        <option value="replaceChild">replaceChild</option>
+                        <option value="removeChild">removeChild</option>
+                    </select>
+                </label>
+
+                <label>
+                    Znacznik nowego elementu
+                    <input id="nodeTag" type="text" value="li" autocomplete="off" spellcheck="false">
+                </label>
+
+                <label>
+                    Tekst nowego elementu
+                    <input id="nodeText" type="text" placeholder="Nowy element" autocomplete="off">
+                </label>
+            </div>
+
+            <div class="playground__actions">
+                <button id="runAction" class="cta">Wykonaj operację</button>
+                <button id="resetPlayground" class="ghost">Resetuj</button>
+            </div>
+
+            <div class="playground__layout">
+                <div class="playground__preview">
+                    <h2>Drzewo DOM</h2>
+                    <p>Zobacz jak zmienia się lista podczas wykonywania operacji.</p>
+                    <ul id="previewList" class="preview-list"></ul>
+                </div>
+
+                <div class="playground__code">
+                    <h2>Wygenerowany kod</h2>
+                    <p>Kopiuj wynik, aby odtworzyć operację u siebie.</p>
+                    <pre><code id="codeSnippet" class="language-javascript"></code></pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>DOM Playground — wszystkie dane pozostają w Twojej przeglądarce.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
